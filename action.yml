@@ -24,6 +24,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
     - id: read-php-version
+      name: "Read PHP Version"
       shell: bash
       working-directory: ${{ inputs.working_directory }}
       run: |
@@ -43,6 +44,7 @@ runs:
         php-version: ${{ steps.read-php-version.outputs.php_version }}
         tools: ${{ inputs.php_tools }}
     - id: composer-cache-find
+      name: "Find Composer Cache"
       shell: bash
       run: |
         {
@@ -68,6 +70,7 @@ runs:
         path: ${{ steps.composer-cache-find.outputs.dir }}
         key: ${{ steps.composer-cache-find.outputs.key }}
     - id: emit-php-detected
+      name: "Emit PHP Detected"
       shell: bash
       run: |
         PHP_VERSION=$(php -v | head -n 1 | cut -d ' ' -f 2 | cut -d '.' -f 1,2)
