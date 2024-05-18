@@ -53,4 +53,14 @@ runs:
       with:
           path: ${{ steps.composer-cache-find.outputs.dir }}
           key: ${{ steps.composer-cache-find.outputs.key }}
+    - shell: bash
+      run: |
+        echo "PHP Version: ${{ steps.read-php-version.outputs.php_version }}"
+        echo "PHP Tools: ${{ inputs.php_tools }}"
+        echo "Composer Cache Dir: ${{ steps.composer-cache-find.outputs.dir }}"
+        echo "Composer Cache Key: ${{ steps.composer-cache-find.outputs.key }}"
+        echo "Composer Cache Restore Key: ${{ steps.composer-cache-find.outputs.restore-key }}"
+        {
+          echo "PHP_VERSION=${{ steps.read-php-version.outputs.php_version }}"
+        } >> $GITHUB_ENV
 
