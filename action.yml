@@ -1,5 +1,8 @@
 name: "Setup PHP Project"
 description: "Sets up a PHP project with GitHub Actions, including detecting PHP version and running composer install."
+branding:
+  color: "orange"
+  icon: "arrow-up-circle"
 
 inputs:
   working_directory:
@@ -14,8 +17,6 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
-    - id: datetime
-      uses: benzine-framework/action-get-datetime@v1
     - id: read-php-version
       shell: bash
       working-directory: ${{ inputs.working_directory }}
