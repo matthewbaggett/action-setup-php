@@ -55,7 +55,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{ steps.composer-cache-find.outputs.dir }}
-        key: ${{ steps.composer-cache-find.outputs.key
+        key: ${{ steps.composer-cache-find.outputs.key }}
         restore-keys: ${{ steps.composer-cache-find.outputs.restore-key }}
     - working-directory: ${{ inputs.working_directory }}
       if: ${{ steps.read-php-version.outputs.has_composer }}
