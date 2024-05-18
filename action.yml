@@ -67,9 +67,11 @@ runs:
       with:
         path: ${{ steps.composer-cache-find.outputs.dir }}
         key: ${{ steps.composer-cache-find.outputs.key }}
-    - shell: bash
+    - id: emit-php-detected
+      shell: bash
       run: |
-        echo "PHP Version: ${{ steps.read-php-version.outputs.php_version }}"
+        PHP_VERSION=$(php -v | head -n 1 | cut -d ' ' -f 2 | cut -d '.' -f 1,2)
+        echo "PHP Version: $PHP_VERSION"
         echo "PHP Tools: ${{ inputs.php_tools }}"
         if [ ${{ steps.read-php-version.outputs.has_composer }} == "true" ]; then
           echo "Composer Cache Dir: ${{ steps.composer-cache-find.outputs.dir }}"
@@ -77,5 +79,6 @@ runs:
           echo "Composer Cache Restore Key: ${{ steps.composer-cache-find.outputs.restore-key }}"
         fi
         {
-          echo "PHP_VERSION=${{ steps.read-php-version.outputs.php_version }}"
+          # Emit installed php version by major release
+          echo "PHP_VERSION=$PHP_VERSION"
         } >> $GITHUB_ENV
