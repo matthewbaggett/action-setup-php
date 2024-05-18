@@ -13,6 +13,12 @@ inputs:
     description: "The PHP tools to install. Comma seperated list from shivammathur/setup-php"
     required: false
     default: ""
+
+outputs:
+  php_version:
+    description: "The PHP version detected from composer.json"
+    value: ${{ steps.read-php-version.outputs.php_version }}
+
 runs:
   using: "composite"
   steps:
