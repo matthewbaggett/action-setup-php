@@ -16,7 +16,7 @@ inputs:
 
 outputs:
   php_version:
-    description: "The PHP version detected from composer.json"
+    description: "The PHP version that was installed, influenced by composer.json"
     value: ${{ steps.emit-php-detected.outputs.php_version }}
 
 runs:
