@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          echo '{"require": {"php": ">=7.4"}}' > composer.json
+          echo '{"require": {"php": "=7.4"}}' > composer.json
       - uses: ./.
       - run: |
           # Verify that PHP is available

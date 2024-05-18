@@ -17,7 +17,7 @@ inputs:
 outputs:
   php_version:
     description: "The PHP version detected from composer.json"
-    value: ${{ steps.read-php-version.outputs.php_version }}
+    value: ${{ steps.emit-php-detected.outputs.php_version }}
 
 runs:
   using: "composite"
@@ -78,7 +78,6 @@ runs:
           echo "Composer Cache Key: ${{ steps.composer-cache-find.outputs.key }}"
           echo "Composer Cache Restore Key: ${{ steps.composer-cache-find.outputs.restore-key }}"
         fi
-        {
-          # Emit installed php version by major release
-          echo "PHP_VERSION=$PHP_VERSION"
-        } >> $GITHUB_ENV
+        # Emit installed php version by major release
+        echo "PHP_VERSION=$PHP_VERSION" >> $GITHUB_ENV
+        echo "php_version=$PHP_VERSION" >> $GITHUB_OUTPUT
