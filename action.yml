@@ -15,7 +15,7 @@ runs:
   steps:
     - uses: actions/checkout@v4
     - id: datetime
-      uses: ./.github/composite-actions/get-datetime
+      uses: benzine-framework/get-datetime@v1
     - id: read-php-version
       shell: bash
       working-directory: ${{ inputs.working_directory }}
