@@ -1,0 +1,56 @@
+name: Test
+
+permissions: read-all
+
+on:
+  push:
+
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  test-no-composer-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.
+      - run: |
+          # Verify that PHP is available
+          if ! command -v php; then
+            echo "PHP is not available"
+            exit 1
+          fi
+          # Verify composer made it too.
+          if ! command -v composer; then
+              echo "Composer is not available"
+              exit 1
+          fi
+          # PHP Version is 8.3 or greater
+          if [ "$(php -r 'echo PHP_VERSION_ID;')" -lt 80300 ]; then
+              echo "PHP Version is less than 8.3"
+              exit 1
+          fi
+  test-with-composer-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          echo '{"require": {"php": ">=7.4"}}' > composer.json
+      - uses: ./.
+      - run: |
+          # Verify that PHP is available
+          if ! command -v php; then
+            echo "PHP is not available"
+            exit 1
+          fi
+          # Verify composer made it too.
+          if ! command -v composer; then
+              echo "Composer is not available"
+              exit 1
+          fi
+          # PHP Version is equal to 7.4 
+          if [ "$(php -r 'echo PHP_VERSION_ID;')" -gte 70400 && "$(php -r 'echo PHP_VERSION_ID;')" -lt 70500 ]; then
+              echo "PHP Version is not 7.4. Got $(php -r 'echo PHP_VERSION_ID;') instead of between 70400-70500"
+              exit 1
+          fi

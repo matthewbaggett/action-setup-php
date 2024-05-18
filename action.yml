@@ -26,7 +26,18 @@ runs:
     - id: read-php-version
       shell: bash
       working-directory: ${{ inputs.working_directory }}
-      run: echo "php_version=$(jq -r '.require["php"]' composer.json | sed -E 's/[^0-9.]//g')" >> $GITHUB_OUTPUT
+      run: |
+        # if composer.json exists, set the php_version output
+        if [ -f composer.json ]; then
+          # And that the require php key exists
+            if jq -e '.require["php"]' composer.json > /dev/null; then
+                php_version=$(jq -r '.require["php"]' composer.json | sed -E 's/[^0-9.]//g')
+                echo "Detected PHP version $php_version from composer.json"
+                echo "php_version=$php_version" >> $GITHUB_OUTPUT
+                echo "has_composer=true" >> $GITHUB_OUTPUT
+                exit 0
+            fi
+        fi
     - uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ steps.read-php-version.outputs.php_version }}
@@ -40,27 +51,31 @@ runs:
           echo "restore-key=${{ runner.os }}-${{ inputs.working_directory }}-composer-"
         } >> $GITHUB_OUTPUT
     - id: composer-cache-restore
+      if: ${{ steps.read-php-version.outputs.has_composer }}
       uses: actions/cache/restore@v4
       with:
         path: ${{ steps.composer-cache-find.outputs.dir }}
         key: ${{ steps.composer-cache-find.outputs.key
         restore-keys: ${{ steps.composer-cache-find.outputs.restore-key }}
     - working-directory: ${{ inputs.working_directory }}
+      if: ${{ steps.read-php-version.outputs.has_composer }}
       shell: bash
       run: composer install --ignore-platform-reqs --prefer-dist
     - id: composer-cache-save
+      if: ${{ steps.read-php-version.outputs.has_composer }}
       uses: actions/cache/save@v4
       with:
-          path: ${{ steps.composer-cache-find.outputs.dir }}
-          key: ${{ steps.composer-cache-find.outputs.key }}
+        path: ${{ steps.composer-cache-find.outputs.dir }}
+        key: ${{ steps.composer-cache-find.outputs.key }}
     - shell: bash
       run: |
         echo "PHP Version: ${{ steps.read-php-version.outputs.php_version }}"
         echo "PHP Tools: ${{ inputs.php_tools }}"
-        echo "Composer Cache Dir: ${{ steps.composer-cache-find.outputs.dir }}"
-        echo "Composer Cache Key: ${{ steps.composer-cache-find.outputs.key }}"
-        echo "Composer Cache Restore Key: ${{ steps.composer-cache-find.outputs.restore-key }}"
+        if [ ${{ steps.read-php-version.outputs.has_composer }} == "true" ]; then
+          echo "Composer Cache Dir: ${{ steps.composer-cache-find.outputs.dir }}"
+          echo "Composer Cache Key: ${{ steps.composer-cache-find.outputs.key }}"
+          echo "Composer Cache Restore Key: ${{ steps.composer-cache-find.outputs.restore-key }}"
+        fi
         {
           echo "PHP_VERSION=${{ steps.read-php-version.outputs.php_version }}"
         } >> $GITHUB_ENV
-
