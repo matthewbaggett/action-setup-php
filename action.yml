@@ -45,11 +45,12 @@ runs:
         tools: ${{ inputs.php_tools }}
     - id: composer-cache-find
       name: "Find Composer Cache"
+      if: ${{ steps.read-php-version.outputs.has_composer }}
       shell: bash
       run: |
         {
           echo "dir=$(composer config cache-files-dir)" 
-          echo "key=${{ runner.os }}-${{ inputs.working_directory }}-composer-${{ hashFiles('${{ inputs.working_directory }}/composer.lock') }}" 
+          echo "key=${{ runner.os }}-${{ inputs.working_directory }}-composer-${{ hashFiles('**/composer.lock') }}" 
           echo "restore-key=${{ runner.os }}-${{ inputs.working_directory }}-composer-"
         } >> $GITHUB_OUTPUT
     - id: composer-cache-restore
