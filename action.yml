@@ -1,0 +1,49 @@
+name: "Setup PHP Project"
+description: "Sets up a PHP project with GitHub Actions, including detecting PHP version and running composer install."
+
+inputs:
+  working_directory:
+    description: "The directory where the project is located."
+    required: false
+    default: "."
+  php_tools:
+    description: "The PHP tools to install. Comma seperated list from shivammathur/setup-php"
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+    - id: datetime
+      uses: ./.github/composite-actions/get-datetime
+    - id: read-php-version
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: echo "php_version=$(jq -r '.require["php"]' composer.json | sed -E 's/[^0-9.]//g')" >> $GITHUB_OUTPUT
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ steps.read-php-version.outputs.php_version }}
+        tools: ${{ inputs.php_tools }}
+    - id: composer-cache-find
+      shell: bash
+      run: |
+        {
+          echo "dir=$(composer config cache-files-dir)" 
+          echo "key=${{ runner.os }}-${{ inputs.working_directory }}-composer-${{ hashFiles('${{ inputs.working_directory }}/composer.lock') }}" 
+          echo "restore-key=${{ runner.os }}-${{ inputs.working_directory }}-composer-"
+        } >> $GITHUB_OUTPUT
+    - id: composer-cache-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ steps.composer-cache-find.outputs.dir }}
+        key: ${{ steps.composer-cache-find.outputs.key
+        restore-keys: ${{ steps.composer-cache-find.outputs.restore-key }}
+    - working-directory: ${{ inputs.working_directory }}
+      shell: bash
+      run: composer install --ignore-platform-reqs --prefer-dist
+    - id: composer-cache-save
+      uses: actions/cache/save@v4
+      with:
+          path: ${{ steps.composer-cache-find.outputs.dir }}
+          key: ${{ steps.composer-cache-find.outputs.key }}
+
