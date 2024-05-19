@@ -65,11 +65,11 @@ runs:
       shell: bash
       run: composer install --ignore-platform-reqs --prefer-dist
     - id: composer-cache-save
-      if: ${{ steps.read-php-version.outputs.has_composer }}
+      if: ${{ always() && steps.read-php-version.outputs.has_composer }}
       uses: actions/cache/save@v4
       with:
         path: ${{ steps.composer-cache-find.outputs.dir }}
-        key: ${{ steps.composer-cache-find.outputs.key }}
+        key: ${{ steps.composer-cache-restore.outputs.cache-primary-key }}
     - id: emit-php-detected
       name: "Emit PHP Detected"
       shell: bash
