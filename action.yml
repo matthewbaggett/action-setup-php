@@ -31,14 +31,21 @@ runs:
         # if composer.json exists, set the php_version output
         if [ -f composer.json ]; then
           # And that the require php key exists
+            echo -n "composer.json exists"
             if jq -e '.require["php"]' composer.json > /dev/null; then
                 php_version=$(jq -r '.require["php"]' composer.json | sed -E 's/[^0-9.]//g')
-                echo "Detected PHP version $php_version from composer.json"
+                echo "and detected PHP version $php_version from composer.json!"
                 echo "php_version=$php_version" >> $GITHUB_OUTPUT
                 echo "has_composer=true" >> $GITHUB_OUTPUT
                 exit 0
+            else
+                echo " ... But does not specify a PHP version!"
+                echo "Please go set a PHP version in the require key of your composer.json"
+                exit 1;
             fi
         fi
+        echo "No PHP version detected"
+        exit 0;
     - uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ steps.read-php-version.outputs.php_version }}
