@@ -49,7 +49,7 @@ jobs:
               echo "Composer is not available"
               exit 1
           fi
-          # PHP Version is equal to 7.4 
+          # PHP Version is equal to 7.4
           if [ "$(php -r 'echo PHP_VERSION_ID;')" -gte 70400 && "$(php -r 'echo PHP_VERSION_ID;')" -lt 70500 ]; then
               echo "PHP Version is not 7.4. Got $(php -r 'echo PHP_VERSION_ID;') instead of between 70400-70500"
               exit 1
